@@ -6,7 +6,7 @@
 \usepackage{hyperref}
 \usepackage{overpic}
 \usepackage{amssymb}
-
+\usepackage{epigraph}
 \usepackage[accepted]{dlaiml2026}
 
 \usepackage{graphicx}
@@ -33,7 +33,11 @@
 	\vskip 0.3in
 ]
 
+
 \printAffiliationsAndNotice{}
+
+\epigraph{Program testing can be used to show the presence of bugs, but never to show their absence!}
+{\textit{― Edsger W. Dijkstra }}
 
 \begin{abstract}
 	%
@@ -49,21 +53,43 @@ di codice per lo sviluppo di applicazioni nella blockchain.
 \section{State of Art}
 
 \section{Methodology}
-
-\begin{figure}
-
-	\includegraphics{software_cicle.drawio.png}
-
+\subsection{Our Approach to Software Engineering}
+In the world of software engineering we model the process of building a program as show in  figure \ref{img:sdc}.
+\begin{figure}[h]
+  \includegraphics[width=0.5 \textwidth]{software_cicle.drawio.png}
 	\caption{Software Development Cycle}
+  \label{img:sdc}
 \end{figure}
+We aim to automate only the implementation phase, all of the other phases are handled by humans.
+The kind of implementation we want to automate is TDD(Test-Driven-Development), but we heavily discourage the usage of Unit Tests.
+The main reason is that unit tests do not prove that the candidate program works for any state of the system i.e. for any possible input.
+So we used Partial Model Checking via Smt solvers, the tests are the definition of invariants of the system which must not be broken, the role of the smt solver 
+is to prove that the invariants we defined hold for all of the possible states in the system.
 
 \begin{equation}
-	S = \{s \mid s \text{ is a sentence is some type of logic } \}
+	S = \{s \mid s \text{ is a constraint in some type of logic } \}
 \end{equation}
 
 \begin{equation}
-	A = \{\pi \mid \pi \models s \text{ for all } s \in S\}
+	A = \{\pi \mid  \forall s \in S \implies \pi \models s\}
 \end{equation}
+Formally in the design phase we defined a set of constraints $\textbf{S}$ and $\textbf{A}$ the set of all possible programs which model our system, 
+this is called model checking.
+But we relaxed the definition of A permitting programs for which it is not feasible to prove their correctness for every possible state, 
+therefore we are actually doing partial model checking.
+
+\subsection{Workflow implementation}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.35 \textwidth]{project/synthLoop.jpg}
+  \caption{Synthesis loop}
+  \label{img:sl}
+\end{figure}
+We implemented this idea by following the example of \cite{}
+% \begin{equation}
+%   \exists \bold{P}  \forall x 
+% \label{eq:}
+% \end{equation}
 
 \begin{equation}
 	argmin_{\pi \in A} \mathbb{E} [ \phi(\pi) ]
