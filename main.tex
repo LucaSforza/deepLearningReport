@@ -91,7 +91,7 @@ We implemented this idea by following the example of \cite{david2017program}:
 These formalizations are then transformed into the skeleton of the project via a deterministic code generator.
 The analyst does this to diminish the search space of all possible programs, the LLM completes the skeleton.
   \item Synthesis by Counter Example \cite{david2017program} as shown in this Figure \ref{img:sl} The LLM proposes a  program which is then checked by the smt solver, if the solver finds a counter-example the
-LLM.
+LLM continues the generator loop.
 We optimized this by adding a fuzzy testing \footnote{https://www.blackduck.com/glossary/what-is-fuzz-testing.html} phase which allows us to skip the SMT if the fuzzy tester fails.
 \end{enumerate}
 LLMs by nature are non deterministic \footnote{This can vary if we change some Hyperparameter e.g. temperature}, therefore we need to constrain them to follow the workflow.
@@ -100,7 +100,7 @@ The implemented hooks are triggered at:
  \begin{enumerate}
    \item PreToolUse: Is used to make the model only edit the files we want to be modified \footnote{For example we do not want the model to change the invariants, etc...}.
    \item PostToolUse: Is used to assure that the model does not modify the skeleton of the application\footnote{e.g. Changing the signature of functions, etc...}.
-   \item Stop: Is used to guarantee a final state for the model checking, so Halmos must either succeed or timeout othewise the LLM must continue with the generation of candidates.
+   \item Stop: Is used to guarantee a final state for the model checking, so SMT solver must either succeed or timeout othewise the LLM must continue with the generation of candidates.
  \end{enumerate}
 
 We also developed an MCP server which exposes different tools to the model which allow the model to compile,do only fuzzy testing and to propose a candidate for complete testing.
@@ -120,7 +120,7 @@ There are some technical reasons: we can easily tell which implementation is bet
 \label{eq:gascost}
 \end{gather*}
 We do this by measuring the median of the GAS \footnote{https://ethereum.org/gas/} usage of the program this metric is given by fuzzy testing as seen in \ref{eq:gascost}.
-This does not find us the real minimum, we are solving a black box problem since we cannot know the real $\phi$, 
+This does not find us the real minimum, we are solving a black box problem since we cannot know the real $\psi$, 
 we use the random search algorithm to find possible candidates which will fill our gas cost distribution function.
 This means that the LLM will try different approaches\footnote{i.e. We give the llm different seeds} to see the most optimal one for the number of runs we made.
 
