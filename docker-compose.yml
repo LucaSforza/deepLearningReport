@@ -1,0 +1,5 @@
+services:
+  compiler:
+    build: .
+    volumes:
+      - .:/data
