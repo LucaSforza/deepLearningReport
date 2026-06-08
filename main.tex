@@ -9,6 +9,8 @@
 
 \usepackage[accepted]{dlaiml2026}
 
+\usepackage{graphicx}
+
 %%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
 \dlaititlerunning{Solidity Code Synthesizer with LLMs and Partial Model Checking}
 
@@ -44,6 +46,34 @@
 In questo lavoro vogliamo presentare un algoritmo per la sintesi
 di codice per lo sviluppo di applicazioni nella blockchain.
 
+\section{State of Art}
+
+\section{Methodology}
+
+\begin{figure}
+
+	\includegraphics{software_cicle.drawio.png}
+
+	\caption{Software Development Cycle}
+\end{figure}
+
+\begin{equation}
+	S = \{s \mid s \text{ is a sentence is some type of logic } \}
+\end{equation}
+
+\begin{equation}
+	A = \{\pi \mid \pi \models s \text{ for all } s \in S\}
+\end{equation}
+
+\begin{equation}
+	argmin_{\pi \in A} \mathbb{E} [ \phi(\pi) ]
+\end{equation}
+
+
+\section{Evaluation}
+
+\section{Conclusion}
+
 % Cose da spiegare
 % Cos'è il program synthesiz, citare paper program_synthesiz.pdf
 %   - Spiegare programazzione automatica per contro esempio e by skect, che poi è quello che utilizziamo
@@ -71,17 +101,6 @@ di codice per lo sviluppo di applicazioni nella blockchain.
 
 % Conclusioni: descrizione dei risultati, commenti sui sviluppi dei modelli locali.
 
-\begin{equation}
-	S = \{s \mid s \text{ is a sentence is some type of logic } \}
-\end{equation}
-
-\begin{equation}
-	A = \{\pi \mid \pi \models s \text{ for all } s \in S\}
-\end{equation}
-
-\begin{equation}
-	argmin_{\pi \in A} \mathbb{E} [ \phi(\pi) ]
-\end{equation}
 
 
 \end{document}
