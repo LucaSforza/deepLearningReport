@@ -51,6 +51,14 @@ In questo lavoro vogliamo presentare un algoritmo per la sintesi
 di codice per lo sviluppo di applicazioni nella blockchain.
 
 \section{State of Art}
+This not a new problem, others have thought about solving it.
+Google tried a Methodology similar to ours \cite{austin2021program} this gave us the concept of overageneralization, overfitting of the invariants and others.
+But the main limitation is that they do not try to optimize the generated code which we actually do.
+We could not find others who tried to do the same thing as ours they usually tried something much simpler \cite{ye2025bridging} \cite{devito2025llm} which tries to fix compilation problems.
+Others have tried to use LLMs to search for security vulnerabilities \cite{le2024robust}.
+Here \cite{chen2026solagent} they tried to make a framework for the same purpouse as ours, but the testing is lacking since they seem to use only unit testing.
+Some have tried to use LLMs to "verify" the generated code \cite{bartoletti2026llms} but as they admit in their paper, 
+it's not a substitution of formal or even fuzzy testing.
 
 \section{Methodology}
 \subsection{Our Approach to Software Engineering}
