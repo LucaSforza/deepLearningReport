@@ -6,7 +6,7 @@ default:
     @just --list
 
 [unix]
-compile:
+compile: build
     docker compose run --rm -w /data/ compiler tectonic main.tex
 
 # Build or rebuild the underlying Docker image
