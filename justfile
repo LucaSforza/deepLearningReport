@@ -17,4 +17,4 @@ build:
 # Clean up temporary build artifacts and logs across all directories
 [unix]
 clean:
-    find . -type f \( -name "*.aux" -o -name "*.fdb_latexmk" -o -name "*.fls" -o -name "*.log" -o -name "*.out" -o -name "*.toc" -o -name "*.synctex.gz" \) -delete
+    docker compose run --rm -w /data/ compiler find . -type f \( -name "*.aux" -o -name "*.fdb_latexmk" -o -name "*.fls" -o -name "*.log" -o -name "*.out" -o -name "*.toc" -o -name "*.synctex.gz" \) -delete

@@ -1,5 +1,5 @@
 \documentclass{article}
-
+\usepackage[numbers]{natbib}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{amsmath}
@@ -85,16 +85,44 @@ therefore we are actually doing partial model checking.
   \caption{Synthesis loop}
   \label{img:sl}
 \end{figure}
-We implemented this idea by following the example of \cite{}
+We implemented this idea by following the example of \cite{david2017program}:
+\begin{enumerate}
+  \item Synthesis by sketch \cite{david2017program} done in the following manner, the Analyst/Designer formalizes the User requests \footnote{i.e. UML,ER,FOL,SOL}.
+These formalizations are then transformed into the skeleton of the project via a deterministic code generator.
+The analyst does this to diminish the search space of all possible programs, the LLM completes the skeleton.
+  \item Synthesis by Counter Example \cite{david2017program} as shown in this Figure \ref{img:sl} The LLM proposes a  program which is then checked by the smt solver, if the solver finds a counter-example the
+LLM.
+We optimized this by adding a fuzzy testing \footnote{https://www.blackduck.com/glossary/what-is-fuzz-testing.html} phase which allows us to skip the SMT if the fuzzy tester fails.
+\end{enumerate}
+LLMs by nature are non deterministic \footnote{This can vary if we change some Hyperparameter e.g. temperature}, therefore we need to constrain them to follow the workflow.
+We do this by following the Hook \footnote{https://code.claude.com/docs/en/hooks} and MCP tools \footnote{https://modelcontextprotocol.io/docs/getting-started/intro}.
+The implemented hooks are triggered at:
+ \begin{enumerate}
+   \item PreToolUse: Is used to make the model only edit the files we want to be modified \footnote{For example we do not want the model to change the invariants, etc...}.
+   \item PostToolUse: Is used to assure that the model does not modify the skeleton of the application\footnote{e.g. Changing the signature of functions, etc...}.
+   \item Stop: Is used to guarantee a final state for the model checking, so Halmos must either succeed or timeout othewise the LLM must continue with the generation of candidates.
+ \end{enumerate}
+
+We also developed an MCP server which exposes different tools to the model which allow the model to compile,do only fuzzy testing and to propose a candidate for complete testing.
+The MCP tool gives back the counter-example if necessary.
+\subsection{Why Blockchains?}
+There are some technical reasons: we can easily tell which implementation is better than the others.
 % \begin{equation}
 %   \exists \bold{P}  \forall x 
 % \label{eq:}
 % \end{equation}
-
-\begin{equation}
-	argmin_{\pi \in A} \mathbb{E} [ \phi(\pi) ]
-\end{equation}
-
+\begin{gather*}
+\text{Let } \mathcal{D}_\pi \text{ gas distribution of } \pi \text{ on fuzzy input.} \\
+\psi(p) = \operatorname{Median}(\mathcal{D}_\pi) = \inf\{g \in \mathbb{N} : F_\pi(g) \ge 1/2\},\\ 
+\quad F_\pi(g) = \Pr_{X \sim \mathcal{D}_\pi}(X \le g). \\
+ \hat{\psi}_n(p) = \operatorname{Median}\bigl(\operatorname{gas}(p, x_i) : i=1,\dots,n\bigr) , x_i \overset{\text{i.i.d.}}{\sim} \mathcal{D}_\pi. \\
+\text{Objective: } \pi^* = \arg\min_{\pi \in A} \hat{ \psi }_n(\pi). \\
+\label{eq:gascost}
+\end{gather*}
+We do this by measuring the median of the GAS \footnote{https://ethereum.org/gas/} usage of the program this metric is given by fuzzy testing as seen in \ref{eq:gascost}.
+This does not find us the real minimum, we are solving a black box problem since we cannot know the real $\phi$, 
+we use the random search algorithm to find possible candidates which will fill our gas cost distribution function.
+This means that the LLM will try different approaches\footnote{i.e. We give the llm different seeds} to see the most optimal one for the number of runs we made.
 
 \section{Evaluation}
 
@@ -127,7 +155,8 @@ We implemented this idea by following the example of \cite{}
 
 % Conclusioni: descrizione dei risultati, commenti sui sviluppi dei modelli locali.
 
-
+\bibliographystyle{abbrvnat}
+\bibliography{references}
 
 \end{document}
 
