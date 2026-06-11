@@ -12,7 +12,7 @@
 \usepackage{graphicx}
 
 %%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
-\dlaititlerunning{Solidity Code Synthesizer with LLMs and Partial Model Checking}
+\dlaititlerunning{Program Synthesis with LLMs in Blockchain Programming}
 
 \begin{document}
 
@@ -183,12 +183,13 @@ We could just set the top-k to 1 but this is conceptually wrong because in this 
 \subsection{Future works}
 We believe that this has potential, to see if it actually has that we must test it with bigger projects like: our 
 \href{https://github.com/BobTheBot988/sec_proj/tree/master}{SSA project}, \href{https://eips.ethereum.org/EIPS/eip-4626}{eip-4626}, \href{https://github.com/Uniswap/v4-core}{uniswap}.
-We actually tried to synthesize our SSA project for time reasons we could not include the results, but from what we have seen it seemed to work preety well so we remain hopeful to test this further.
+We actually tried to synthesize our SSA project, alas for time reasons we could not include the results, but from what we have seen it seemed 
+to work pretty well so we remain hopeful to test this further.
 We also think that to synthesize big projects with hundreds of \href{https://docs.soliditylang.org/en/latest/contracts.html}{contracts} we may need to use a divide et impera approach,
 which would make the model synthesize the contracts not all at the same time but in an ordered manner.
 
 
-
+\pagebreak
 \bibliographystyle{abbrvnat}
 \bibliography{references}
 
