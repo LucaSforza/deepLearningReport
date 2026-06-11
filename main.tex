@@ -40,15 +40,20 @@
 {\textit{― Edsger W. Dijkstra }}
 
 \begin{abstract}
-	%
-	This is a \LaTeX template for writing your project report, to be submitted as part of the final exam. The template can not be modified (you can not change margins, spaces, etc.), and using this template is mandatory. Please read the main text for further details.
-	%
+In this work we want to present a workflow designed to synthesize solidity projects.
+We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
+This was done by looking at how others have approached this kind of problem and expanding on that.
+We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
+From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
+
 \end{abstract}
 
 \section{Introduction}
-
-In questo lavoro vogliamo presentare un algoritmo per la sintesi
-di codice per lo sviluppo di applicazioni nella blockchain.
+In this work we want to present a workflow designed to synthesize solidity projects.
+We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
+This was done by looking at how others have approached this kind of problem and expanding on that.
+We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
+From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
 
 \section{State of Art}
 This not a new problem, others have thought about solving it.
@@ -134,30 +139,18 @@ This means that the LLM will try different approaches\footnote{i.e. We give the 
 
 \section{Evaluation}
 
-Per l'evaluation abbiamo scielto i seguenti 3 modelli: Qwen3.6 27B denso finetunato
-sul linguaggio di programmazione Solidity. Qwen3.6 27B denso generalista e DeepSeek v4 Flash
-284B MoE 13B attivi.
 
-I due qwen sono stati eseguiti in locale in un nostro ambiente di esecuzione con llama.cpp, mentre DeepSeek è stato usato tramite API.
+For the evaluation, we chose the following 3 models: Qwen3.6 27B dense fine-tuned on the Solidity programming language\footnote{This\ was\ quantized\ by\ us:\ https://huggingface.co/SoftDream11/Qwen3.6-Solidity-27B-GGUF}, Qwen3.6 27B dense generalist\footnote{https://huggingface.co/unsloth/Qwen3.6-27B-GGUF?show\_file\_info=Qwen3.6-27B-Q6\_K.gguf}, and DeepSeek v4 Flash 284B MoE with 13B active parameters, and we synthesized this auction\footnote{https://github.com/BobTheBot988/test2/tree/master} designed by us.
 
-
-Come mostrato in fugura \ref{img:box}
-il modello migliore è stato Qwen3.6 finetunato.
-
-Sorprendetemente DeepSeek (nonostante sia il modello più grande)
-ha dato scarsi risultati nella sintesi.
-
-Però è stato il più veloce tra tutti a completare le implementazioni, ma questo
-è stato sicuramente dato dal fatto che abbiamo usato le API.
-
-Invece Qwen3.6 non finetunato è stato il più lento.
-
-Durante l'inferenza abbiamo usato un System Prompt che andava a spiegare
-i tool e i limiti che imponiamo al modello per poter fare la sintesi
-(hook, mcp tools, limiti sui comandi da poter eseguire, ecc...)
-
-Oltre a questo abbiamo utilizzato un prompt iniziale che è Domain Specific all'implementazione
-da effettuare.
+The two Qwen models were run locally in our own execution environment using `llama.cpp`, while DeepSeek was used via API.
+As shown in Figure \ref{img:box}, the best model was the fine-tuned Qwen3.6.
+Surprisingly, DeepSeek (despite being the largest model) yielded poor results in synthesis.
+However, it was the fastest of all to complete the implementations, though this was certainly due to the fact that we used the API.
+On the other hand, the non-fine-tuned Qwen3.6 was the slowest.
+\\ As can be seen in the pareto Figure \ref{img:gas_tokens_pareto}
+the points on the frontier are the best implementations when we consider the amount of used 
+tokens(input+output) and the gas which the implementation uses, this results suggest that to have good gas usage we must use more tokens.
+We used a System Prompt\footnote{https://github.com/BobTheBot988/git\_diff\_checker/blob/d9d7d6525443a2e0cddb121f4f36c6d8ddc5df66/test/prompt.md} that explained the tools and the constraints we impose on the model to perform the synthesis (hooks, MCP tools, limits on executable commands, etc...).
 
 \begin{figure}[h]
 	\includegraphics[width=0.5 \textwidth]{gas_boxplot.png}
@@ -170,6 +163,7 @@ da effettuare.
 	\label{img:gas_tokens_pareto}
 \end{figure}
 \section{Conclusion}
+
 \subsection{Reproducibility}
 We wanted to make the testing Reproducible, we developed a system to do so, but we encountered an unovercomable issue.
 We set the seed to our inference engine and our fuzz tester, however when doing multiple GPU-inference the behaviour\footnote{https://github.com/ollama/ollama/pull/5760}\footnote{https://github.com/ggml-org/llama.cpp/issues/8593}
@@ -177,7 +171,10 @@ is non deterministic because floating point operations are not commutative and t
 Since the gpus cache will behave in a different manner each time and cannot be manipulated.
 We could just set the top-k to 1 but this is conceptually wrong because in this way we are doing only exploitation and no exploration of the problem, since the llm would just spit out the same output no matter the seed.
 \subsection{Future works}
-For bigger projects like our SSA project \footnote{https://github.com/BobTheBot988/sec\_proj/tree/master}.
+We believe that this has potential, to see if it actually has that we must test it with bigger projects like: our SSA project \footnote{https://github.com/BobTheBot988/sec\_proj/tree/master},eip-4626 \footnote{https://eips.ethereum.org/EIPS/eip-4626}, uniswap
+\footnote{https://github.com/Uniswap/v4-core}.
+We actually tried to synthesize our SSA project for time reasons we could not include the results, but from what we have seen it seemed to work preety well so we remain hopeful to test this further.
+We also think that to synthesize big projects with hundreds of contracts\footnote{https://docs.soliditylang.org/en/latest/contracts.html} we may need to use a divide et impera approach, which would make the model synthesize the contracts not all at the same time but in an ordered manner.
 
 
 \bibliographystyle{abbrvnat}
