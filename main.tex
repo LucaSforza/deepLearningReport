@@ -40,28 +40,23 @@
 {\textit{― Edsger W. Dijkstra }}
 
 \begin{abstract}
-	In this work we want to present a workflow designed to synthesize solidity projects.
+	In this work we want to present a workflow designed to synthesize solidity projects which are the most efficient(Hopefully).
 	We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
 	This was done by looking at how others have approached this kind of problem and expanding on that.
-	We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
+	We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as others have.
 	From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
-
 \end{abstract}
 
 \section{Introduction}
-
-Blockchain programming è un campo di nicchia.
-Nella Blockchain si possono pubblicare Smart Contract (che possiamo vedere come classi in Java)
-e utenti della Blockchain possono usarli per avere servizi.
-Essendo un campo di nicchia non ci aspettiamo che gli LLM
-sappiano perfettamente il linguaggio di programmazione utilizzato, overo Solidity.
-Un altra sfida che offro questo campo è la sicurezza.
-Una volta pubblicato un contratto non si può tornare indietro e modificare l'errore, ma il codice
-è inciso indielebilmente nella Blockchain.
-Quindi le allucinazioni degli LLM possono causare tantissimi danni economici se
-non viene verificato il comportamento del contratto.
-Infatti il trucco è quello di poter verificare formalmente il comportamento del codice generato e questa è stata la metodologia usata
-nel nostro lavoro.
+Blockchain programming is a niche field. In a blockchain, one can deploy Smart Contracts (which can be thought of as classes in Java),
+and blockchain users can interact with them to access services. Since it is a niche field, we do not expect LLMs 
+to perfectly know the programming language used, namely Solidity.
+Another challenge that this field presents is security. Once a contract is deployed, there is no turning back to fix an error;
+the code is indelibly etched into the blockchain.
+Therefore, LLM hallucinations can cause immense financial damage if the contract's behavior is not verified.
+Consequently, we must formally verify the behavior of the generated code, which was the methodology used in our work.
+We also look not only for the correctness to the specified problem but also at the most efficient implementation, 
+in this context for efficiency we mean the amount of gas/money a contract uses when called upon.
 
 \section{State of Art}
 This not a new problem, others have thought about solving it.
@@ -84,8 +79,8 @@ In the world of software engineering we model the process of building a program 
 We aim to automate only the implementation phase, all of the other phases are handled by humans.
 The kind of implementation we want to automate is TDD(Test-Driven-Development), but we heavily discourage the usage of Unit Tests.
 The main reason is that unit tests do not prove that the candidate program works for any state of the system i.e. for any possible input.
-So we used Partial Model Checking via Smt solvers, the tests are the definition of invariants of the system which must not be broken, the role of the smt solver
-is to prove that the invariants we defined hold for all of the possible states in the system.
+The invariants of the system which must not be broken are defined as tests in the target language.
+The role of the smt solver is to prove that the invariants we defined hold for all of the possible states in the system.
 
 \begin{equation}
 	S = \{s \mid s \text{ is a constraint in some type of logic } \}
@@ -108,25 +103,25 @@ therefore we are actually doing partial model checking.
 \end{figure}
 We implemented this idea by following the example of \cite{david2017program}:
 \begin{enumerate}
-	\item Synthesis by sketch \cite{david2017program} done in the following manner, the Analyst/Designer formalizes the User requests \footnote{i.e. UML,ER,FOL,SOL}.
-	      These formalizations are then transformed into the skeleton of the project via a deterministic code generator.
+	\item Synthesis by sketch \cite{david2017program} is done in the following manner, the Analyst/Designer formalizes the User requests\footnote{i.e. UML,ER,FOL,SOL}.
+    These formalizations are then transformed into the skeleton of the project via a \href{https://github.com/LucaSforza/Umbrello-Solidity}{deterministic code generator}.
 	      The analyst does this to diminish the search space of all possible programs, the LLM completes the skeleton.
 	\item Synthesis by Counter Example \cite{david2017program} as shown in this Figure \ref{img:sl} The LLM proposes a  program which is then checked by the smt solver, if the solver finds a counter-example the
 	      LLM continues the generator loop.
-	      We optimized this by adding a fuzzy testing \footnote{https://www.blackduck.com/glossary/what-is-fuzz-testing.html} phase which allows us to skip the SMT if the fuzzy tester fails.
+	      We optimized this by adding a \href{https://www.blackduck.com/glossary/what-is-fuzz-testing.html}{fuzzy testing}  phase which allows us to skip the SMT Solver if the fuzzy tester fails.
 \end{enumerate}
-LLMs by nature are non deterministic \footnote{This can vary if we change some Hyperparameter e.g. temperature}, therefore we need to constrain them to follow the workflow.
-We do this by following the Hook \footnote{https://code.claude.com/docs/en/hooks} and MCP tools \footnote{https://modelcontextprotocol.io/docs/getting-started/intro}.
+LLMs by nature are non deterministic *\footnote{This can vary if we change some Hyperparameter e.g. temperature}, therefore we need to constrain them to follow the workflow.
+We do this by following the \href{https://code.claude.com/docs/en/hooks}{Hook} and \href{https://modelcontextprotocol.io/docs/getting-started/intro}{MCP} standards.
 The implemented hooks are triggered at:
 \begin{enumerate}
 	\item PreToolUse: Is used to make the model only edit the files we want to be modified \footnote{For example we do not want the model to change the invariants, etc...}.
 	\item PostToolUse: Is used to assure that the model does not modify the skeleton of the application\footnote{e.g. Changing the signature of functions, etc...}.
-	\item Stop: Is used to guarantee a final state for the model checking, so SMT solver must either succeed or timeout othewise the LLM must continue with the generation of candidates.
+	\item Stop: Is used to guarantee a final state for the model checking, so the SMT solver must either succeed or timeout othewise the LLM must continue with the generation of candidates.
 \end{enumerate}
 
-We also developed an MCP server which exposes different tools to the model which allow the model to compile,do only fuzzy testing and to propose a candidate for complete testing.
+We also developed an MCP server which exposes different tools to the model which allows the model to compile, do only fuzzy testing and to propose a candidate for complete testing.
 The MCP tool gives back the counter-example if necessary.
-\subsection{Why Blockchains?}
+\subsection{Why did we choose Blockchains?}
 There are some technical reasons: we can easily tell which implementation is better than the others.
 % \begin{equation}
 %   \exists \bold{P}  \forall x 
@@ -139,16 +134,19 @@ There are some technical reasons: we can easily tell which implementation is bet
 	\hat{\psi}_n(p) = \operatorname{Median}\bigl(\operatorname{gas}(p, x_i) : i=1,\dots,n\bigr) , x_i \overset{\text{i.i.d.}}{\sim} \mathcal{D}_\pi. \\
 	\text{Objective: } \pi^* = \arg\min_{\pi \in A} \hat{ \psi }_n(\pi). \\
 	\label{eq:gascost}
+   \tag{Gas Cost Equation}
 \end{gather*}
-We do this by measuring the median of the GAS \footnote{https://ethereum.org/gas/} usage of the program this metric is given by fuzzy testing as seen in \ref{eq:gascost}.
-This does not find us the real minimum, we are solving a black box problem since we cannot know the real $\psi$,
-we use the random search algorithm to find possible candidates which will fill our gas cost distribution function.
-This means that the LLM will try different approaches\footnote{i.e. We give the llm different seeds} to see the most optimal one for the number of runs we made.
+We do this by measuring the median of the \href{https://ethereum.org/gas/}{GAS} usage of the program this metric is given by fuzzy testing as seen in \ref{eq:gascost}.
+This formula defines a black box problem which we use since we cannot know the real $\psi$.
+To solve this problem we chose the random search algorithm to find the possible candidates which will fill our gas cost distribution function.
+This means that the LLM will try different approaches to see the most optimal one for the number of runs we made.
 
 \section{Evaluation}
 
 
-For the evaluation, we chose the following 3 models: Qwen3.6 27B dense fine-tuned on the Solidity programming language\footnote{This\ was\ quantized\ by\ us:\ https://huggingface.co/SoftDream11/Qwen3.6-Solidity-27B-GGUF}, Qwen3.6 27B dense generalist\footnote{https://huggingface.co/unsloth/Qwen3.6-27B-GGUF?show\_file\_info=Qwen3.6-27B-Q6\_K.gguf}, and DeepSeek v4 Flash 284B MoE with 13B active parameters, and we synthesized this auction\footnote{https://github.com/BobTheBot988/test2/tree/master} designed by us.
+For the evaluation, we chose the following 3 models: \href{https://huggingface.co/SoftDream11/Qwen3.6-Solidity-27B-GGUF}{Qwen3.6 27B dense fine-tuned on the Solidity programming language} (This was quantized by us)
+\href{https://huggingface.co/unsloth/Qwen3.6-27B-GGUF?show_file_info=Qwen3.6-27B-Q6_K.gguf}{Qwen3.6 27B dense generalist},
+and \href{https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash}{DeepSeek v4 Flash} 284B MoE with 13B active parameters, and we synthesized this \href{https://github.com/BobTheBot988/test2/tree/master}{auction} designed by us.
 
 The two Qwen models were run locally in our own execution environment using `llama.cpp`, while DeepSeek was used via API.
 As shown in Figure \ref{img:box}, the best model was the fine-tuned Qwen3.6.
@@ -158,7 +156,9 @@ On the other hand, the non-fine-tuned Qwen3.6 was the slowest.
 \\ As can be seen in the pareto Figure \ref{img:gas_tokens_pareto}
 the points on the frontier are the best implementations when we consider the amount of used
 tokens(input+output) and the gas which the implementation uses, this results suggest that to have good gas usage we must use more tokens.
-We used a System Prompt\footnote{https://github.com/BobTheBot988/git\_diff\_checker/blob/d9d7d6525443a2e0cddb121f4f36c6d8ddc5df66/test/prompt.md} that explained the tools and the constraints we impose on the model to perform the synthesis (hooks, MCP tools, limits on executable commands, etc...).
+We used a \href{https://github.com/BobTheBot988/git_diff_checker/blob/d9d7d6525443a2e0cddb121f4f36c6d8ddc5df66/test/prompt.md}{System Prompt}
+that explained the tools and the constraints we impose on the model to perform the synthesis
+(hooks, MCP tools, limits on executable commands, etc...).
 
 \begin{figure}[h]
 	\includegraphics[width=0.5 \textwidth]{gas_boxplot.png}
@@ -174,15 +174,19 @@ We used a System Prompt\footnote{https://github.com/BobTheBot988/git\_diff\_chec
 
 \subsection{Reproducibility}
 We wanted to make the testing Reproducible, we developed a system to do so, but we encountered an unovercomable issue.
-We set the seed to our inference engine and our fuzz tester, however when doing multiple GPU-inference the behaviour\footnote{https://github.com/ollama/ollama/pull/5760}\footnote{https://github.com/ggml-org/llama.cpp/issues/8593}
+We set the seed to our inference engine and our fuzz tester, however when doing multiple GPU-inference the behaviour
+\footnote{\href{https://github.com/ollama/ollama/pull/5760}{https://github.com/ollama/ollama/pull/5760}}
+\footnote{\href{https://github.com/ggml-org/llama.cpp/issues/8593}{https://github.com/ggml-org/llama.cpp/issues/8593}}
 is non deterministic because floating point operations are not commutative and the fact that we have multiple gpus implies that the way the operations are done cannot be always the same.
 Since the gpus cache will behave in a different manner each time and cannot be manipulated.
 We could just set the top-k to 1 but this is conceptually wrong because in this way we are doing only exploitation and no exploration of the problem, since the llm would just spit out the same output no matter the seed.
 \subsection{Future works}
-We believe that this has potential, to see if it actually has that we must test it with bigger projects like: our SSA project \footnote{https://github.com/BobTheBot988/sec\_proj/tree/master},eip-4626 \footnote{https://eips.ethereum.org/EIPS/eip-4626}, uniswap
-\footnote{https://github.com/Uniswap/v4-core}.
+We believe that this has potential, to see if it actually has that we must test it with bigger projects like: our 
+\href{https://github.com/BobTheBot988/sec_proj/tree/master}{SSA project}, \href{https://eips.ethereum.org/EIPS/eip-4626}{eip-4626}, \href{https://github.com/Uniswap/v4-core}{uniswap}.
 We actually tried to synthesize our SSA project for time reasons we could not include the results, but from what we have seen it seemed to work preety well so we remain hopeful to test this further.
-We also think that to synthesize big projects with hundreds of contracts\footnote{https://docs.soliditylang.org/en/latest/contracts.html} we may need to use a divide et impera approach, which would make the model synthesize the contracts not all at the same time but in an ordered manner.
+We also think that to synthesize big projects with hundreds of \href{https://docs.soliditylang.org/en/latest/contracts.html}{contracts} we may need to use a divide et impera approach,
+which would make the model synthesize the contracts not all at the same time but in an ordered manner.
+
 
 
 \bibliographystyle{abbrvnat}
