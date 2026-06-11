@@ -170,6 +170,14 @@ da effettuare.
 	\label{img:gas_tokens_pareto}
 \end{figure}
 \section{Conclusion}
+\subsection{Reproducibility}
+We wanted to make the testing Reproducible, we developed a system to do so, but we encountered an unovercomable issue.
+We set the seed to our inference engine and our fuzz tester, however when doing multiple GPU-inference the behaviour\footnote{https://github.com/ollama/ollama/pull/5760}\footnote{https://github.com/ggml-org/llama.cpp/issues/8593}
+is non deterministic because floating point operations are not commutative and the fact that we have multiple gpus implies that the way the operations are done cannot be always the same.
+Since the gpus cache will behave in a different manner each time and cannot be manipulated.
+We could just set the top-k to 1 but this is conceptually wrong because in this way we are doing only exploitation and no exploration of the problem, since the llm would just spit out the same output no matter the seed.
+\subsection{Future works}
+For bigger projects like our SSA project \footnote{https://github.com/BobTheBot988/sec_proj/tree/master}.
 
 
 \bibliographystyle{abbrvnat}
