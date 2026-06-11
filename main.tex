@@ -40,20 +40,28 @@
 {\textit{― Edsger W. Dijkstra }}
 
 \begin{abstract}
-In this work we want to present a workflow designed to synthesize solidity projects.
-We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
-This was done by looking at how others have approached this kind of problem and expanding on that.
-We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
-From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
+	In this work we want to present a workflow designed to synthesize solidity projects.
+	We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
+	This was done by looking at how others have approached this kind of problem and expanding on that.
+	We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
+	From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
 
 \end{abstract}
 
 \section{Introduction}
-In this work we want to present a workflow designed to synthesize solidity projects.
-We succeessfully implemented an environment which constrains the LLM into following the specified workflow.
-This was done by looking at how others have approached this kind of problem and expanding on that.
-We used claude code's cli tool as an agentic wrapper because the  implementation of hooks is heavily consistent with the documentation and it did not give us many problems as other have.
-From our testing we speculate that this field is promising, and that to write efficient code we need to use fine-tuned models and the more the tokens the better the final result.
+
+Blockchain programming è un campo di nicchia.
+Nella Blockchain si possono pubblicare Smart Contract (che possiamo vedere come classi in Java)
+e utenti della Blockchain possono usarli per avere servizi.
+Essendo un campo di nicchia non ci aspettiamo che gli LLM
+sappiano perfettamente il linguaggio di programmazione utilizzato, overo Solidity.
+Un altra sfida che offro questo campo è la sicurezza.
+Una volta pubblicato un contratto non si può tornare indietro e modificare l'errore, ma il codice
+è inciso indielebilmente nella Blockchain.
+Quindi le allucinazioni degli LLM possono causare tantissimi danni economici se
+non viene verificato il comportamento del contratto.
+Infatti il trucco è quello di poter verificare formalmente il comportamento del codice generato e questa è stata la metodologia usata
+nel nostro lavoro.
 
 \section{State of Art}
 This not a new problem, others have thought about solving it.
@@ -148,7 +156,7 @@ Surprisingly, DeepSeek (despite being the largest model) yielded poor results in
 However, it was the fastest of all to complete the implementations, though this was certainly due to the fact that we used the API.
 On the other hand, the non-fine-tuned Qwen3.6 was the slowest.
 \\ As can be seen in the pareto Figure \ref{img:gas_tokens_pareto}
-the points on the frontier are the best implementations when we consider the amount of used 
+the points on the frontier are the best implementations when we consider the amount of used
 tokens(input+output) and the gas which the implementation uses, this results suggest that to have good gas usage we must use more tokens.
 We used a System Prompt\footnote{https://github.com/BobTheBot988/git\_diff\_checker/blob/d9d7d6525443a2e0cddb121f4f36c6d8ddc5df66/test/prompt.md} that explained the tools and the constraints we impose on the model to perform the synthesis (hooks, MCP tools, limits on executable commands, etc...).
 
